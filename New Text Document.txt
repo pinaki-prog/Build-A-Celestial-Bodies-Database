@@ -1,0 +1,121 @@
+
+CREATE DATABASE universe;
+\c universe;
+
+CREATE TABLE galaxy (
+    galaxy_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    type TEXT,
+    size_light_years NUMERIC,
+    has_black_hole INT,
+    num_stars INT NOT NULL
+);
+
+INSERT INTO galaxy (name, type, size_light_years, has_black_hole, num_stars)
+VALUES
+    ('Milky 1 Way', 'Spiral', 1000, 5,400),
+    ('Andrmeda', 'Spiral', 2200, 41,1400),
+    ('Triangu', 'Spiral', 5000, 24,540),
+    ('Messier', 'Elliptical', 15000, 41, 5100),
+    ('NGC', 'Barred Spiral', 700, 456, 810),
+    ('Sombro', 'Spiral', 5000, 45, 610);
+
+
+CREATE TABLE star (
+    star_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    spectral_type VARCHAR(10),
+    mass_kg NUMERIC,
+    radius_km INT NOT NULL,
+    luminosity BOOLEAN,
+    galaxy_id INT REFERENCES galaxy(galaxy_id)
+);
+
+INSERT INTO star (name, spectral_type, mass_kg, radius_km, luminosity, galaxy_id)
+VALUES
+    ('Sun', 'G2V', 1.98, 6340, TRUE, 1),
+    ('Beteluse', 'M1', 7.1, 180, TRUE, 1),
+    ('Sirius', 'A1', 2.30, 1.76, TRUE, 2),
+    ('Proxima', 'MVe', 2.429, 1900, FALSE, 2),
+    ('Alpha A', 'GV', 2.230, 8340, TRUE, 2),
+    ('Alpha B', 'KV', 1.30, 6900, FALSE, 2);
+
+CREATE TABLE planet (
+    planet_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    type VARCHAR(20),
+    mass_kg NUMERIC,
+    radius_km INT NOT NULL,
+    has_life BOOLEAN,
+    star_id INT REFERENCES star(star_id)
+);
+
+INSERT INTO planet (name, type, mass_kg, radius_km, has_life, star_id)
+VALUES
+    ('Earth', 'Terrestrial', 5.924, 6371, TRUE, 1),
+    ('Mars', 'Terrestrial', 6.323, 3389, FALSE, 1),
+    ('Jupiter', 'Gas Giant', 1.827, 691, FALSE, 2),
+    ('Saturn', 'Gas Giant', 5.6826, 232, FALSE, 2),
+    ('Venus', 'Terrestrial', 4.8624, 6052, FALSE, 3),
+    ('Kepler', 'Exoplanet', 3.24, 680, TRUE, 4),
+    ('Gliese ', 'Exoplanet', 3.25, 500, FALSE, 4),
+    ('WASP', 'Hot Jupiter', 6.227, 1442, FALSE, 5),
+    ('TOI', 'Exoplanet', 1.475, 8570, TRUE, 6),
+    ('Trappist', 'Exoplanet', 4.24, 9450, TRUE, 6),
+    ('Cancri e', 'Super Earth', 8.625, 2.39e4, FALSE, 6),
+    ('HD b', 'Exoplanet', 4.724, 6635, FALSE, 6);
+
+CREATE TABLE moon (
+    moon_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    type VARCHAR(20),
+    diameter_km INT NOT NULL,
+    has_water BOOLEAN,
+    planet_id INT REFERENCES planet(planet_id)
+);
+
+INSERT INTO moon (name, type, diameter_km, has_water, planet_id)
+VALUES
+    ('Luna', 'Terrestrial', 3474, TRUE, 1),
+    ('Phobos', 'Irregular', 22.4, FALSE, 2),
+    ('Europa', 'Ice Moon', 3121.6, TRUE, 3),
+    ('Titan', 'Saturnian Moon', 5150, TRUE, 4),
+    ('Deimos', 'Irregular', 12.4, FALSE, 2),
+    ('Ganymede', 'Galilean Moon', 5262.4, TRUE, 3),
+    ('Enceladus', 'Ice Moon', 504.2, TRUE, 4),
+    ('Io', 'Galilean Moon', 3642, FALSE, 3),
+    ('Triton', 'Neptunian Moon', 2706.8, TRUE, 5),
+    ('Callisto', 'Galilean Moon', 4800, TRUE, 4),
+    ('Charon', 'Plutonian Moon', 1212, TRUE, 6),
+    ('Oberon', 'Umbriel Moon', 1523.2, TRUE, 5),
+    ('Titania', 'Umbriel Moon', 1577.8, FALSE, 5),
+    ('Rhea', 'Titanian Moon', 1528, TRUE, 4),
+    ('Iapetus', 'Titanian Moon', 1468, FALSE, 4),
+    ('Miranda', 'Uranian Moon', 471.6, TRUE, 5),
+    ('Dione', 'Titanian Moon', 1122.8, FALSE, 4),
+    ('Hyperion', 'Titanian Moon', 270.4, FALSE, 4),
+    ('Phoebe', 'Irregular', 213.8, FALSE, 4),
+    ('Amalthea', 'Jovian Moon', 250, FALSE, 3);
+
+CREATE TABLE celestial_body (
+    celestial_body_ID SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    type VARCHAR(20),
+    mass_kg NUMERIC,
+    radius_km int not null,
+    has_atmosphere BOOLEAN,
+    discovery_year INT,
+    celestial_parent_id INT,  
+    CONSTRAINT fk_celestial_parent
+        FOREIGN KEY (celestial_parent_id)
+        REFERENCES celestial_body(celestial_parent_id)
+);
+
+INSERT INTO celestial_body (name, type, mass_kg, radius_km, has_atmosphere, discovery_year, celestial_parent_id)
+VALUES
+    ('Andromeda Galaxy', 'Galaxy', NULL, 5,NULL, 1764, NULL),
+    ('Betelgeuse', 'Star', 7.71, 1180, FALSE, NULL, NULL),
+    ('Earth', 'Planet', 5.924, 6371, TRUE, 0, 2),  
+    ('Luna', 'Moon', NULL, 3474, NULL, NULL, 3),  
+    ('Messier', 'Galaxy', NULL, 46,NULL, 1781, NULL);
+
